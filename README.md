@@ -1,4 +1,12 @@
 # Undiscord - Delete all messages in a Discord channel or DM
+
+## Preamble
+
+The original author/maintainer [victorpb](https://github.com/victornpb/) seems to have completely abandoned the project.
+
+This fork aims to keep the project alive again through bug fixes, etc.
+
+## Getting started
 <!-- shields -->
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/victornpb/undiscord?color=%235865f2&display_name=tag&label=Undiscord&style=flat-square)][greasyfork_url]
 [![GitHub Release Date](https://img.shields.io/github/release-date/victornpb/undiscord?style=flat-square)](https://github.com/victornpb/undiscord/releases)
@@ -123,3 +131,8 @@ Please read: [what I'm doing to ensure this is safe for users][security_policy].
 <!-- Download links -->
   [greasyfork_url]: <https://greasyfork.org/en/scripts/406540-undiscord-delete-all-messages-in-a-discord-channel-or-dm-bulk-deletion> "Get Undiscord from GreasyFork"
   [openuserjs_url]: <https://openuserjs.org/scripts/victornpb/Undiscord_-_Delete_all_messages_in_a_Discord_channel_or_DM_(Bulk_deletion)> "Get Undiscord from OpenUserJS"
+
+## Known issues
+
+- The token can no longer be extracted by clicking on "Fill"
+- The deletion process can duplicate into two separate functions and trigger the API limitations
