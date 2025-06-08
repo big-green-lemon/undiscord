@@ -3,15 +3,15 @@
 // @description     Delete all messages in a Discord channel or DM (Bulk deletion)
 // @version         5.2.3
 // @author          victornpb
-// @homepageURL     https://github.com/victornpb/undiscord
-// @supportURL      https://github.com/victornpb/undiscord/discussions
+// @homepageURL     https://github.com/big-green-lemon/undiscord
+// @supportURL      https://github.com/big-green-lemon/undiscord/discussions
 // @match           https://*.discord.com/app
 // @match           https://*.discord.com/channels/*
 // @match           https://*.discord.com/login
 // @license         MIT
-// @namespace       https://github.com/victornpb/deleteDiscordMessages
+// @namespace       https://github.com/big-green-lemon/deleteDiscordMessages
 // @icon            https://victornpb.github.io/undiscord/images/icon128.png
-// @downloadURL     https://raw.githubusercontent.com/victornpb/deleteDiscordMessages/master/deleteDiscordMessages.user.js
+// @downloadURL     https://raw.githubusercontent.com/big-green-lemon/deleteDiscordMessages/master/deleteDiscordMessages.user.js
 // @contributionURL https://www.buymeacoffee.com/vitim
 // @grant           none
 // ==/UserScript==
