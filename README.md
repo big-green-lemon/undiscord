@@ -134,5 +134,5 @@ Please read: [what I'm doing to ensure this is safe for users][security_policy].
 
 ## Known issues
 
-- The token can no longer be extracted by clicking on "Fill"
-- The deletion process can duplicate into two separate functions and trigger the API limitations
+- ~~The token can no longer be extracted by clicking on "Fill"~~
+- ~~The deletion process can duplicate into two separate functions and trigger the API limitations~~
