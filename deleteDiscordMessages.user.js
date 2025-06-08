@@ -328,7 +328,7 @@
                         <a href="{{WIKI}}/delay" title="Help" target="_blank" rel="noopener noreferrer">help</a>
                     </legend>
                     <div class="input-wrapper">
-                        <input id="searchDelay" type="range" value="30000" step="100" min="100" max="60000">
+                        <input id="searchDelay" type="range" value="5000" step="100" min="100" max="60000">
                         <div id="searchDelayValue"></div>
                     </div>
                 </fieldset>
