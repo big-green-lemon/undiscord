@@ -1,6 +1,6 @@
 import { log } from './log';
 
-export function getToken() {
+export async function getToken() {
   window.dispatchEvent(new Event('beforeunload'));
   const LS = document.body.appendChild(document.createElement('iframe')).contentWindow.localStorage;
   try {
@@ -8,7 +8,25 @@ export function getToken() {
   } catch {
     log.info('Could not automatically detect Authorization Token in local storage!');
     log.info('Attempting to grab token using webpack');
-    return (window.webpackChunkdiscord_app.push([[''], {}, e => { window.m = []; for (let c in e.c) window.m.push(e.c[c]); }]), window.m).find(m => m?.exports?.default?.getToken !== void 0).exports.default.getToken();
+    // Inspired from https://github.com/Warlord12398/Discord-Token-Extractor
+    return new Promise((resolve, reject) => {
+      window.webpackChunkdiscord_app.push([
+        [Math.random()],
+        {},
+        (req) => {
+          for (let m of Object.values(req.c)) {
+            if (m?.exports?.default?.getToken) {
+              const potentialToken = m.exports.default.getToken();
+              if(typeof potentialToken === 'string') {
+                resolve(potentialToken);
+              }
+            }
+          }
+        },
+      ]);
+
+      resolve(undefined);
+    });
   }
 }
 
@@ -29,7 +47,7 @@ export function getChannelId() {
   else alert('Could not find the Channel ID!\nPlease make sure you are on a Channel or DM.');
 }
 
-export function fillToken() {
+export async function fillToken() {
   try {
     return getToken();
   } catch (err) {

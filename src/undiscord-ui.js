@@ -129,7 +129,7 @@ function initUI() {
     if (id) $('input#maxId').value = id;
     toggleWindow();
   };
-  $('button#getToken').onclick = () => $('input#token').value = fillToken();
+  $('button#getToken').onclick = async () => $('input#token').value = await fillToken();
 
   // sync delays
   $('input#searchDelay').onchange = (e) => {
