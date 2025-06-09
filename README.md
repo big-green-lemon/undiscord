@@ -14,9 +14,7 @@ This README will not be as complete as the original one, as there is already eve
 [![GitHub License](https://img.shields.io/github/license/big-green-lemon/undiscord?style=flat-square)](https://github.com/big-green-lemon/undiscord/blob/master/LICENSE)
 <!-- end shields -->
     
-1. Install Undiscord:  
-
-  Follow the guide on the original [repository](https://github.com/big-green-lemon/undiscord/wiki).
+**To Install Undiscord**, follow the guide on the original [repository](https://github.com/victornpb/undiscord/tree/master).
 
 ----
 ### Need help?
@@ -93,3 +91,4 @@ Please read: [what I'm doing to ensure this is safe for users][security_policy].
 
 - ~~The token can no longer be extracted by clicking on "Fill"~~
 - ~~The deletion process can duplicate into two separate functions and trigger the API limitations~~
+- ~~The delete process can loop forever because of a change in the Discord API~~
