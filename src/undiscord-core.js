@@ -44,9 +44,11 @@ class UndiscordCore {
     offset: 0,
     iterations: 0,
 
+    mapBadMessages: new Set(),
     _seachResponse: null,
     _messagesToDelete: [],
     _skippedMessages: [],
+    duplicate: false
   };
 
   stats = {
@@ -72,9 +74,11 @@ class UndiscordCore {
       offset: 0,
       iterations: 0,
 
+      mapBadMessages: new Set(),
       _seachResponse: null,
       _messagesToDelete: [],
       _skippedMessages: [],
+      duplicate: false
     };
 
     this.options.askForConfirmation = true;
@@ -128,6 +132,7 @@ class UndiscordCore {
 
     if (this.onStart) this.onStart(this.state, this.stats);
 
+    let emptyAPIPageError = 0;
     do {
       this.state.iterations++;
 
@@ -154,6 +159,7 @@ class UndiscordCore {
       // if there are messages to delete, delete them
       if (this.state._messagesToDelete.length > 0) {
 
+        emptyAPIPageError = 0;
         if (await this.confirm() === false) {
           this.state.running = false; // break out of a job
           break; // immmediately stop this iteration
@@ -170,10 +176,24 @@ class UndiscordCore {
         log.verb(`Skipped ${this.state._skippedMessages.length} out of ${this.state._seachResponse.messages.length} in this page.`, `(Offset was ${oldOffset}, ajusted to ${this.state.offset})`);
       }
       else {
-        log.verb('Ended because API returned an empty page.');
-        log.verb('[End state]', this.state);
-        if (isJob) break; // break without stopping if this is part of a job
-        this.state.running = false;
+        log.verb(`API returned an empty page, retrying in ${(this.options.searchDelay / 1000).toFixed(2)}s`);
+        emptyAPIPageError++;
+
+        //potential edge case (?) if there are no more messages to delete -- empty-page error could be looping
+        //assume rate-limited on first fetch if grandTotal equals zero, fallback on other case
+        if (
+          this.state.delCount === this.state.grandTotal &&
+          this.state.grandTotal !== 0
+        ) {
+          log.verb('[End State]', this.state);
+          this.state.running = false;
+          if (isJob) break;
+        }
+        //fault-tolerance: assume faulty messages and end the loop
+        if (emptyAPIPageError > 15) {
+          this.state.running = false;
+          if (isJob) break;
+        }
       }
 
       // wait before next page (fix search page not updating fast enough)
@@ -347,14 +367,24 @@ class UndiscordCore {
       // Delete a single message (with retry)
       let attempt = 0;
       while (attempt < this.options.maxAttempt) {
-        const result = await this.deleteMessage(message);
+        if (!this.state.mapBadMessages.has(message.id)) {
+          const result = await this.deleteMessage(message);
 
-        if (result === 'RETRY') {
+          if (result === 'RETRY') {
+            attempt++;
+            log.verb(`Retrying in ${this.options.deleteDelay}ms... (${attempt}/${this.options.maxAttempt})`);
+            await wait(this.options.deleteDelay);
+          } else break;
+        } else {
+          if (this.state.duplicate === true) {
+            //skip if more than 1 duplicate message in queue
+            this.options.maxId = message.id;
+            this.state.duplicate = false;
+          } else this.state.duplicate = true;
+          log.warn(`Skipping message ${message.id} because it is marked as bad -- skipping POST request`);
+          //still increment
           attempt++;
-          log.verb(`Retrying in ${this.options.deleteDelay}ms... (${attempt}/${this.options.maxAttempt})`);
-          await wait(this.options.deleteDelay);
         }
-        else break;
       }
 
       this.calcEtr();
