@@ -330,7 +330,7 @@ async function startAction() {
   // single channel
   else {
     try {
-      await undiscordCore.run();
+      await undiscordCore.run(true);
     } catch (err) {
       log.error('CoreException', err);
       undiscordCore.stop();
