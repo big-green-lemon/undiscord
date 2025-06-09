@@ -5,7 +5,7 @@ import banner from 'rollup-plugin-banner2';
 import json from '@rollup/plugin-json';
 import serve from 'rollup-plugin-serve';
 import bakedEnv from 'rollup-plugin-baked-env';
-import S from 'tiny-dedent';
+import dedent from 'dedent';
 
 import { string } from './build/strings-plugin.mjs';
 import userScriptMetadataBlock from './build/metadata.mjs';
@@ -58,7 +58,7 @@ if (!production) {
         const host = address.address === '::1' ? 'localhost' : address.address;
         // by using a bound function, we can access options as `this`
         const protocol = this.https ? 'https' : 'http';
-        console.log(S(`
+        console.log(dedent(`
         \n\n
         Live server started...
         _____________________________________________________________
