@@ -1,25 +1,24 @@
 // ==UserScript==
-// @name            Undiscord
-// @description     Delete all messages in a Discord channel or DM (Bulk deletion)
-// @version         5.2.3
-// @author          victornpb
-// @homepageURL     https://github.com/big-green-lemon/undiscord
-// @supportURL      https://github.com/big-green-lemon/undiscord/discussions
-// @match           https://*.discord.com/app
-// @match           https://*.discord.com/channels/*
-// @match           https://*.discord.com/login
-// @license         MIT
-// @namespace       https://github.com/big-green-lemon/deleteDiscordMessages
-// @icon            https://victornpb.github.io/undiscord/images/icon128.png
-// @downloadURL     https://raw.githubusercontent.com/big-green-lemon/deleteDiscordMessages/master/deleteDiscordMessages.user.js
-// @contributionURL https://www.buymeacoffee.com/vitim
-// @grant           none
+// @name        Undiscord
+// @description Delete all messages in a Discord channel or DM (Bulk deletion)
+// @version     5.2.4
+// @author      big-green-lemon
+// @homepageURL https://github.com/big-green-lemon/undiscord
+// @supportURL  https://github.com/big-green-lemon/undiscord/issues
+// @match       https://*.discord.com/app
+// @match       https://*.discord.com/channels/*
+// @match       https://*.discord.com/login
+// @license     MIT
+// @namespace   https://github.com/big-green-lemon/undiscord
+// @icon        https://raw.githubusercontent.com/big-green-lemon/undiscord/refs/heads/master/images/icon128.png
+// @downloadURL https://raw.githubusercontent.com/big-green-lemon/undiscord/master/deleteDiscordMessages.user.js
+// @grant       none
 // ==/UserScript==
 (function () {
 	'use strict';
 
 	/* rollup-plugin-baked-env */
-	const VERSION = "5.2.3";
+	const VERSION = "5.2.4";
 
 	var themeCss = (`
 /* undiscord window */
@@ -462,9 +461,11 @@
 	    offset: 0,
 	    iterations: 0,
 
+	    mapBadMessages: new Set(),
 	    _seachResponse: null,
 	    _messagesToDelete: [],
 	    _skippedMessages: [],
+	    duplicate: false
 	  };
 
 	  stats = {
@@ -490,9 +491,11 @@
 	      offset: 0,
 	      iterations: 0,
 
+	      mapBadMessages: new Set(),
 	      _seachResponse: null,
 	      _messagesToDelete: [],
 	      _skippedMessages: [],
+	      duplicate: false
 	    };
 
 	    this.options.askForConfirmation = true;
@@ -546,6 +549,7 @@
 
 	    if (this.onStart) this.onStart(this.state, this.stats);
 
+	    let emptyAPIPageError = 0;
 	    do {
 	      this.state.iterations++;
 
@@ -572,6 +576,7 @@
 	      // if there are messages to delete, delete them
 	      if (this.state._messagesToDelete.length > 0) {
 
+	        emptyAPIPageError = 0;
 	        if (await this.confirm() === false) {
 	          this.state.running = false; // break out of a job
 	          break; // immmediately stop this iteration
@@ -588,10 +593,24 @@
 	        log.verb(`Skipped ${this.state._skippedMessages.length} out of ${this.state._seachResponse.messages.length} in this page.`, `(Offset was ${oldOffset}, ajusted to ${this.state.offset})`);
 	      }
 	      else {
-	        log.verb('Ended because API returned an empty page.');
-	        log.verb('[End state]', this.state);
-	        if (isJob) break; // break without stopping if this is part of a job
-	        this.state.running = false;
+	        log.verb(`API returned an empty page, retrying in ${(this.options.searchDelay / 1000).toFixed(2)}s`);
+	        emptyAPIPageError++;
+
+	        //potential edge case (?) if there are no more messages to delete -- empty-page error could be looping
+	        //assume rate-limited on first fetch if grandTotal equals zero, fallback on other case
+	        if (
+	          this.state.delCount === this.state.grandTotal &&
+	          this.state.grandTotal !== 0
+	        ) {
+	          log.verb('[End State]', this.state);
+	          this.state.running = false;
+	          if (isJob) break;
+	        }
+	        //fault-tolerance: assume faulty messages and end the loop
+	        if (emptyAPIPageError > 15) {
+	          this.state.running = false;
+	          if (isJob) break;
+	        }
 	      }
 
 	      // wait before next page (fix search page not updating fast enough)
@@ -765,14 +784,24 @@
 	      // Delete a single message (with retry)
 	      let attempt = 0;
 	      while (attempt < this.options.maxAttempt) {
-	        const result = await this.deleteMessage(message);
+	        if (!this.state.mapBadMessages.has(message.id)) {
+	          const result = await this.deleteMessage(message);
 
-	        if (result === 'RETRY') {
+	          if (result === 'RETRY') {
+	            attempt++;
+	            log.verb(`Retrying in ${this.options.deleteDelay}ms... (${attempt}/${this.options.maxAttempt})`);
+	            await wait(this.options.deleteDelay);
+	          } else break;
+	        } else {
+	          if (this.state.duplicate === true) {
+	            //skip if more than 1 duplicate message in queue
+	            this.options.maxId = message.id;
+	            this.state.duplicate = false;
+	          } else this.state.duplicate = true;
+	          log.warn(`Skipping message ${message.id} because it is marked as bad -- skipping POST request`);
+	          //still increment
 	          attempt++;
-	          log.verb(`Retrying in ${this.options.deleteDelay}ms... (${attempt}/${this.options.maxAttempt})`);
-	          await wait(this.options.deleteDelay);
 	        }
-	        else break;
 	      }
 
 	      this.calcEtr();
@@ -1171,7 +1200,7 @@ body.undiscord-pick-message.after [id^="message-content-"]:hover::after {
 	};
 	window.messagePicker = messagePicker;
 
-	function getToken() {
+	async function getToken() {
 	  window.dispatchEvent(new Event('beforeunload'));
 	  const LS = document.body.appendChild(document.createElement('iframe')).contentWindow.localStorage;
 	  try {
@@ -1179,7 +1208,25 @@ body.undiscord-pick-message.after [id^="message-content-"]:hover::after {
 	  } catch {
 	    log.info('Could not automatically detect Authorization Token in local storage!');
 	    log.info('Attempting to grab token using webpack');
-	    return (window.webpackChunkdiscord_app.push([[''], {}, e => { window.m = []; for (let c in e.c) window.m.push(e.c[c]); }]), window.m).find(m => m?.exports?.default?.getToken !== void 0).exports.default.getToken();
+	    // Inspired from https://github.com/Warlord12398/Discord-Token-Extractor
+	    return new Promise((resolve, reject) => {
+	      window.webpackChunkdiscord_app.push([
+	        [Math.random()],
+	        {},
+	        (req) => {
+	          for (let m of Object.values(req.c)) {
+	            if (m?.exports?.default?.getToken) {
+	              const potentialToken = m.exports.default.getToken();
+	              if(typeof potentialToken === 'string') {
+	                resolve(potentialToken);
+	              }
+	            }
+	          }
+	        },
+	      ]);
+
+	      resolve(undefined);
+	    });
 	  }
 	}
 
@@ -1200,7 +1247,7 @@ body.undiscord-pick-message.after [id^="message-content-"]:hover::after {
 	  else alert('Could not find the Channel ID!\nPlease make sure you are on a Channel or DM.');
 	}
 
-	function fillToken() {
+	async function fillToken() {
 	  try {
 	    return getToken();
 	  } catch (err) {
@@ -1325,7 +1372,7 @@ body.undiscord-pick-message.after [id^="message-content-"]:hover::after {
 	    if (id) $('input#maxId').value = id;
 	    toggleWindow();
 	  };
-	  $('button#getToken').onclick = () => $('input#token').value = fillToken();
+	  $('button#getToken').onclick = async () => $('input#token').value = await fillToken();
 
 	  // sync delays
 	  $('input#searchDelay').onchange = (e) => {
@@ -1509,7 +1556,7 @@ body.undiscord-pick-message.after [id^="message-content-"]:hover::after {
 	  // single channel
 	  else {
 	    try {
-	      await undiscordCore.run();
+	      await undiscordCore.run(true);
 	    } catch (err) {
 	      log.error('CoreException', err);
 	      undiscordCore.stop();
