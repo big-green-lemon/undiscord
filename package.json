@@ -1,7 +1,7 @@
 {
   "name": "undiscord",
   "nameFull": "Undiscord",
-  "version": "5.2.4",
+  "version": "5.2.5",
   "description": "Delete all messages in a Discord channel or DM (Bulk deletion)",
   "userScript": {
     "namespace": "https://github.com/big-green-lemon/undiscord",
@@ -12,7 +12,8 @@
     ],
     "icon": "https://raw.githubusercontent.com/big-green-lemon/undiscord/refs/heads/master/images/icon128.png",
     "downloadURL": "https://raw.githubusercontent.com/big-green-lemon/undiscord/master/deleteDiscordMessages.user.js",
-    "grant": "none"
+    "grant": "none",
+    "attribution": "Original project (https://github.com/victornpb/undiscord)"
   },
   "license": "MIT",
   "engines": {

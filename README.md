@@ -13,6 +13,19 @@ This README will not be as complete as the original one, as there is already eve
 [![GitHub Release Date](https://img.shields.io/github/release-date/big-green-lemon/undiscord?style=flat-square)](https://github.com/big-green-lemon/undiscord/releases)
 [![GitHub License](https://img.shields.io/github/license/big-green-lemon/undiscord?style=flat-square)](https://github.com/big-green-lemon/undiscord/blob/master/LICENSE)
 <!-- end shields -->
+
+> ⚠️ **Any tool that automates actions on user accounts, including this one, could result in account termination.** (see [self-bots][self-bots]).  
+> Use at your own risk! ([discussion](https://github.com/victornpb/undiscord/discussions/273)).
+
+(Due to changes in chrome manifest V3, [Brave browser][brave_browser] is recommended)
+
+1. First you need a Browser Extension for managing UserScripts[[1]][userscrips_faq] (skip if you already have one): '
+   * Brave: [Violentmonkey][chrome_violentmonkey] or [Tampermonkey][chrome_tampermonkey]
+   * Chrome: [Violentmonkey][chrome_violentmonkey] or [Tampermonkey][chrome_tampermonkey]
+   * Firefox: [Greasemonkey][firefox_greasemonkey], [Tampermonkey][firefox_tampermonkey], or [Violentmonkey][firefox_violentmonkey]  
+   * Opera: [Tampermonkey][opera_tampermonkey] or [Violentmonkey][opera_violentmonkey]
+   * Edge: [Tampermonkey][edge_tampermonkey]  
+   * Safari: ~[Tampermonkey][safari_tampermonkey]~ 
     
 **To Install Undiscord**, follow the guide on the original [repository](https://github.com/victornpb/undiscord/tree/master).
 
