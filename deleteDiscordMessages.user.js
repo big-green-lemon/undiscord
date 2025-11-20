@@ -13,6 +13,7 @@
 // @icon        https://raw.githubusercontent.com/big-green-lemon/undiscord/refs/heads/master/images/icon128.png
 // @downloadURL https://raw.githubusercontent.com/big-green-lemon/undiscord/master/deleteDiscordMessages.user.js
 // @grant       none
+// @attribution Original project (https://github.com/victornpb/undiscord)
 // ==/UserScript==
 (function () {
 	'use strict';
@@ -83,7 +84,8 @@
 #undiscord .row { display: flex; flex-direction: row; align-items: center; }
 #undiscord .mb1 { margin-bottom: 8px; }
 #undiscord .log { margin-bottom: 0.25em; }
-#undiscord .log-debug { color: inherit; }
+#undiscord .log-debug { /* Buggy color on my Discord */
+    color: white; }
 #undiscord .log-info { color: #00b0f4; }
 #undiscord .log-verb { color: #72767d; }
 #undiscord .log-warn { color: #faa61a; }

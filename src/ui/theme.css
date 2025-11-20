@@ -332,7 +332,8 @@
 }
 
 #undiscord .log-debug {
-    color: inherit;
+    /* Buggy color on my Discord */
+    color: white;
 }
 
 #undiscord .log-info {
