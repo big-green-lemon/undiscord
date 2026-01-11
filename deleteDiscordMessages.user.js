@@ -13,6 +13,7 @@
 // @icon        https://raw.githubusercontent.com/big-green-lemon/undiscord/refs/heads/master/images/icon128.png
 // @downloadURL https://raw.githubusercontent.com/big-green-lemon/undiscord/master/deleteDiscordMessages.user.js
 // @grant       none
+// @attribution Original project (https://github.com/victornpb/undiscord)
 // ==/UserScript==
 (function () {
 	'use strict';
@@ -93,12 +94,11 @@
 
 	var mainCss = (`
 /**** Undiscord Button ****/
-#undicord-btn { position: relative; width: auto; height: 24px; margin: 0 8px; cursor: pointer; color: var(--interactive-normal); flex: 0 0 auto; }
+#undicord-btn { position: relative; width: auto; height: 24px; margin: 0 8px; cursor: pointer; flex: 0 0 auto; }
 #undicord-btn progress { position: absolute; top: 23px; left: -4px; width: 32px; height: 12px; display: none; }
-#undicord-btn.running { color: var(--button-danger-background) !important; }
 #undicord-btn.running progress { display: block; }
 /**** Undiscord Interface ****/
-#undiscord { position: fixed; z-index: 100; top: 58px; right: 10px; display: flex; flex-direction: column; width: 800px; height: 80vh; min-width: 610px; max-width: 100vw; min-height: 448px; max-height: 100vh; color: var(--text-normal); border-radius: 4px; background-color: var(--background-secondary); box-shadow: var(--elevation-stroke), var(--elevation-high); will-change: top, left, width, height; }
+#undiscord { position: fixed; z-index: 100; top: 58px; right: 10px; display: flex; flex-direction: column; width: 800px; height: 80vh; min-width: 610px; max-width: 100vw; min-height: 448px; max-height: 100vh; color: white; border-radius: 4px; background-color: var(--background-secondary); box-shadow: var(--elevation-stroke), var(--elevation-high); will-change: top, left, width, height; }
 #undiscord .header .icon { cursor: pointer; }
 #undiscord .window-body { height: calc(100% - 48px); }
 #undiscord .sidebar { overflow: hidden scroll; overflow-y: auto; width: 270px; min-width: 250px; height: 100%; max-height: 100%; padding: 8px; background: var(--bg-overlay-4, var(--background-base-lowest)); }
@@ -1305,7 +1305,7 @@ body.undiscord-pick-message.after [id^="message-content-"]:hover::after {
 	  ui.undiscordBtn = createElm(buttonHtml);
 	  ui.undiscordBtn.onclick = toggleWindow;
 	  function mountBtn() {
-	    const toolbar = document.querySelector('#app-mount [class^=toolbar]');
+	    const toolbar = document.querySelector('#app-mount [class*="-toolbar"]');
 	    if (toolbar) toolbar.appendChild(ui.undiscordBtn);
 	  }
 	  mountBtn();
