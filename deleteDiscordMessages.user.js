@@ -1305,10 +1305,11 @@ body.undiscord-pick-message.after [id^="message-content-"]:hover::after {
 	  ui.undiscordBtn = createElm(buttonHtml);
 	  ui.undiscordBtn.onclick = toggleWindow;
 	  function mountBtn() {
-	    const toolbar = document.querySelector('#app-mount [class*="-toolbar"]');
+	    const toolbar = document.querySelector('#app-mount div[class^="toolbar"]');
 	    if (toolbar) toolbar.appendChild(ui.undiscordBtn);
 	  }
 	  mountBtn();
+
 	  // watch for changes and re-mount button if necessary
 	  const discordElm = document.querySelector('#app-mount');
 	  let observerThrottle = null;
